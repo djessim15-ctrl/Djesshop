@@ -275,3 +275,23 @@ h1, h2, h3, p { margin: 0; }
   .admin-content { padding-top: 35px; }.admin-title-row h1, .admin-login h1 { font-size: 34px; }.admin-panel { padding: 18px; }.admin-login { margin: 50px auto; padding: 26px; }.block-form { grid-template-columns: 1fr; }.block-item { flex-wrap: wrap; }.block-item button { margin-left: 0; }.request-item-head time { width: 100%; margin-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+
+/* Admin notification centre */
+.admin-notifications { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px 24px; margin-bottom: 27px; padding: 19px 21px; border: 1px solid #dce3ff; background: #eef1ff; border-radius: 5px; }
+.notification-summary { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.notification-bell { flex: none; position: relative; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: var(--blue); background: #fff; }
+.notification-bell > span { position: absolute; right: -5px; top: -5px; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 2px solid #eef1ff; border-radius: 20px; color: #fff; background: #e96d65; font-size: 9px; font-weight: 850; }
+.notification-copy strong { color: var(--ink); font-size: 13px; }
+.notification-copy p { max-width: 480px; color: #6f758b; font-size: 11px; line-height: 1.55; margin-top: 4px; }
+.notification-buttons { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.notification-buttons .small-button { min-height: 38px; }
+.notification-buttons .notification-enable { color: white; background: var(--blue); border-color: var(--blue); }
+.notification-buttons .notification-enable:hover { background: var(--blue-dark); color: white; }
+.notification-feedback { width: 100%; color: #39744a; font-size: 11px; line-height: 1.5; margin: -3px 0 0 62px; }
+.notification-feedback.error { color: #b52e36; }
+@media (max-width: 550px) {
+  .admin-notifications { align-items: flex-start; padding: 17px; }
+  .notification-summary { align-items: flex-start; }
+  .notification-buttons { margin-left: 62px; }
+  .notification-feedback { margin-left: 0; }
+}

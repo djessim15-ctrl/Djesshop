@@ -95,7 +95,7 @@ export default function Landing() {
           </div>
           <div className="hero-visual">
             <div className="hero-image-wrap">
-              <img className="hero-image" src="/images/hero-atelier.webp" alt="Objets décoratifs colorés imprimés en 3D" />
+              <img className="hero-image" src="/images/hero-atelier.webp" alt="Figurine en buste, porte-téléphone et pot à crayons personnalisé imprimés en 3D" />
               <div className="image-tag"><span className="tag-icon"><Sparkles size={17} /></span><span>DES IDÉES<br /><strong>QUI PRENNENT VIE</strong></span></div>
               <div className="hero-image-caption"><span>Imaginé par vous.<br /><strong>Imprimé pour vous.</strong></span><ArrowUpRight size={19} /></div>
             </div>
@@ -124,7 +124,7 @@ export default function Landing() {
           <div className="steps-grid">
             <article className="step-card">
               <div className="step-top"><span>01</span><span className="step-icon icon-blue"><PenLine size={24} strokeWidth={1.5} /></span></div>
-              <h3>Racontez-nous votre idée</h3><p>Un objet pratique, un cadeau, une déco… Décrivez-nous ce que vous imaginez.</p><span className="step-bottom">VOTRE IMAGINATION <ArrowRight size={15} /></span>
+              <h3>Racontez-nous votre idée</h3><p>Une figurine, un porte-téléphone, un cadeau… Décrivez-nous ce que vous imaginez.</p><span className="step-bottom">VOTRE IMAGINATION <ArrowRight size={15} /></span>
             </article>
             <article className="step-card">
               <div className="step-top"><span>02</span><span className="step-icon icon-yellow"><Palette size={24} strokeWidth={1.5} /></span></div>
@@ -140,12 +140,12 @@ export default function Landing() {
 
       <section id="inspirations" className="inspiration-section">
         <div className="container inspiration-grid">
-          <div className="inspiration-image"><img src="/images/idea-objects.webp" alt="Exemples d’objets créatifs imprimés en 3D" loading="lazy" /><div className="inspiration-label"><Sparkles size={17} /> PLACE À L’IMAGINATION</div></div>
+          <div className="inspiration-image"><img src="/images/idea-objects.webp" alt="Porte-téléphone, figurine en buste et pot à crayons avec prénom" loading="lazy" /><div className="inspiration-label"><Sparkles size={17} /> PLACE À L’IMAGINATION</div></div>
           <div className="inspiration-copy">
             <div className="section-kicker"><span>✳</span> PENSÉ PAR VOUS, CRÉÉ POUR VOUS</div>
             <h2>Une idée ?<br /><em>Tout commence là.</em></h2>
-            <p>Le petit objet qui vous manque, un cadeau qui a du sens ou une idée que vous n’avez vue nulle part ailleurs : parlons-en !</p>
-            <div className="idea-tags"><span>Déco qui change</span><span>Objets utiles</span><span>Cadeaux uniques</span><span>Et bien plus encore ✳</span></div>
+            <p>Une figurine en buste, un porte-téléphone ou un pot à crayons avec votre prénom : imaginez l’objet qui vous ressemble.</p>
+            <div className="idea-tags"><span>Figurines en buste</span><span>Porte-téléphones</span><span>Pots à crayons avec prénom</span><span>Et bien plus encore ✳</span></div>
             <a className="inline-link" href="#projet">Donner vie à mon idée <ArrowUpRight size={17} /></a>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function Landing() {
             <div className="section-kicker"><span>✳</span> À VOUS DE JOUER</div>
             <h2>Alors, on crée<br /><em>quelque chose ?</em></h2>
             <p>Les plus belles créations commencent souvent par une simple idée. Racontez-nous la vôtre, on a hâte de la découvrir.</p>
-            <div className="project-image"><img src="/images/feature-print.webp" alt="Vase bleu aux formes ondulées imprimé en 3D" loading="lazy" /><div className="project-image-note"><span>✳</span> De votre imagination<br /><strong>à la réalité.</strong></div></div>
+            <div className="project-image"><img src="/images/feature-print.webp" alt="Pot à crayons bleu imprimé en 3D, personnalisé avec le prénom Léo" loading="lazy" /><div className="project-image-note"><span>✳</span> De votre imagination<br /><strong>à la réalité.</strong></div></div>
             <div className="project-reassurance"><span className="reassurance-icon"><Heart size={17} /></span><span><strong>Une question, une idée folle ?</strong><br />On est là pour en parler.</span></div>
           </div>
           <div className="form-card">
@@ -181,7 +181,7 @@ export default function Landing() {
                     <label className="field"><span>Votre prénom ou nom <b>*</b></span><input required minLength={2} maxLength={100} placeholder="Comment vous appelez-vous ?" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoComplete="name" /></label>
                     <label className="field"><span>Votre adresse e-mail <b>*</b></span><input required type="email" maxLength={254} placeholder="vous@exemple.fr" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} autoComplete="email" /></label>
                   </div>
-                  <label className="field description-field"><span>Votre idée, en quelques mots <b>*</b></span><textarea required minLength={10} maxLength={3000} placeholder="Racontez-nous votre idée : l’objet, ses dimensions, son utilisation... Plus il y a de détails, mieux c’est !" rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /><small>{form.description.length} / 3 000</small></label>
+                  <label className="field description-field"><span>Votre idée, en quelques mots <b>*</b></span><textarea required minLength={10} maxLength={3000} placeholder="Figurine en buste, porte-téléphone, pot à crayons avec prénom… Décrivez votre idée et ses dimensions !" rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /><small>{form.description.length} / 3 000</small></label>
                   <fieldset className="color-fieldset"><legend>Choisissez votre couleur <b>*</b></legend><div className="color-options">{COLORS.map((color) => <label className={`color-option ${selectedColor === color.name ? 'is-selected' : ''}`} key={color.name}><input type="radio" name="color" value={color.name} checked={selectedColor === color.name} onChange={() => setSelectedColor(color.name)} /><span className="color-dot" style={{ backgroundColor: color.value }}>{selectedColor === color.name && <Check size={14} strokeWidth={2.8} />}</span><span>{color.name}</span></label>)}</div></fieldset>
                   <label className="field quantity-field"><span>Quantité souhaitée <b>*</b></span><input type="number" min={1} max={1000} required value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></label>
                   <label className="honeypot" aria-hidden="true">Site web<input name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} /></label>

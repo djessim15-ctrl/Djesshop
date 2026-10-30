@@ -46,5 +46,5 @@ function unavailable(pathname: string) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|images/|icon.svg|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|images/|icon.svg|icon-192.png|icon-512.png|admin-manifest.webmanifest|sw.js|favicon.ico).*)'],
 };

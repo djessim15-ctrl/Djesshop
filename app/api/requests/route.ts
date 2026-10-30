@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getClientIp } from '@/lib/client-ip';
 import { getSupabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { validateRequest } from '@/lib/validation';
+import { notifyAdmins } from '@/lib/push';
 
 export async function POST(request: Request) {
   // Explicitly opt-in, development-only visual preview. No real data is stored.
@@ -35,6 +36,8 @@ export async function POST(request: Request) {
     if (blocked?.length) return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
     const { error } = await supabase.from('print_requests').insert({ ...validated.data, ip });
     if (error) throw error;
+    // Await delivery attempts in serverless runtimes, but do not fail the saved request.
+    await notifyAdmins();
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {
     console.error('Request could not be saved:', error);
