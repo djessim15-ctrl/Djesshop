@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import {
   ArrowDown, ArrowRight, ArrowUpRight, Box, Check, CheckCircle2, ChevronRight,
-  CircleHelp, Heart, Lightbulb, Menu, MessageSquareText, MousePointer2,
-  PackageCheck, Palette, PenLine, Send, Sparkles, X,
+  CircleHelp, Heart, ImagePlus, Lightbulb, Menu, MessageSquareText, MousePointer2,
+  PackageCheck, Palette, PenLine, Send, Sparkles, Trash2, X,
 } from 'lucide-react';
 import { COLORS, type ColorName } from '@/lib/colors';
+import { photoSelectionError, preparePhoto } from '@/lib/photo-client';
 
 const initialForm = { name: '', email: '', description: '', quantity: '1', website: '' };
 
@@ -27,7 +28,34 @@ export default function Landing() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState('');
+  const [photoError, setPhotoError] = useState('');
+  const photoInput = useRef<HTMLInputElement>(null);
   const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
+  useEffect(() => {
+    if (!photo) { setPhotoPreview(''); return; }
+    const url = URL.createObjectURL(photo);
+    setPhotoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photo]);
+
+  function choosePhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const error = photoSelectionError(file);
+    if (status === 'error') { setStatus('idle'); setMessage(''); }
+    setPhotoError(error || '');
+    setPhoto(error ? null : file);
+    if (error) event.target.value = '';
+  }
+
+  function removePhoto() {
+    setPhoto(null); setPhotoError('');
+    if (status === 'error') { setStatus('idle'); setMessage(''); }
+    if (photoInput.current) photoInput.current.value = '';
+  }
 
   function chooseColor(color: ColorName) {
     setSelectedColor(color);
@@ -36,21 +64,32 @@ export default function Landing() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (photoError) { setStatus('error'); setMessage('Vérifiez la photo ou continuez sans photo.'); return; }
     setStatus('sending');
     setMessage('');
     try {
-      const result = await fetch('/api/requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, color: selectedColor, quantity: Number(form.quantity) }),
-      });
-      const data = await result.json();
+      const payload = { ...form, color: selectedColor, quantity: Number(form.quantity) };
+      let body: BodyInit;
+      let headers: HeadersInit | undefined;
+      if (photo) {
+        const image = await preparePhoto(photo);
+        const data = new FormData();
+        for (const [key, value] of Object.entries(payload)) data.append(key, String(value));
+        data.append('photo', image, image.type === 'image/webp' ? 'photo.webp' : 'photo.jpg');
+        body = data;
+      } else {
+        headers = { 'Content-Type': 'application/json' };
+        body = JSON.stringify(payload);
+      }
+      const result = await fetch('/api/requests', { method: 'POST', headers, body });
+      const data = await result.json().catch(() => ({}));
       if (!result.ok) throw new Error(data.error || 'Une erreur est survenue. Réessayez plus tard.');
       setStatus('success');
       setMessage(data.demo
         ? 'Ceci est un envoi de démonstration : aucune demande n’a été transmise.'
         : 'Votre demande a bien été envoyée. Nous reviendrons vers vous par e-mail pour discuter de votre projet.');
       setForm(initialForm);
+      removePhoto();
     } catch (error) {
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'Une erreur est survenue. Réessayez plus tard.');
@@ -182,12 +221,24 @@ export default function Landing() {
                     <label className="field"><span>Votre adresse e-mail <b>*</b></span><input required type="email" maxLength={254} placeholder="vous@exemple.fr" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} autoComplete="email" /></label>
                   </div>
                   <label className="field description-field"><span>Votre idée, en quelques mots <b>*</b></span><textarea required minLength={10} maxLength={3000} placeholder="Fidget, accessoire de bureau, objet pratique… Décrivez votre idée et ses dimensions !" rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /><small>{form.description.length} / 3 000</small></label>
+                  <div className="photo-field">
+                    <div className="photo-heading"><span id="photo-label">Une photo pour illustrer votre idée ?</span><span>FACULTATIF</span></div>
+                    <p id="photo-hint">Un exemple, un objet ou un croquis peut nous aider. JPG, PNG ou WebP · 25 Mo max.</p>
+                    <label className="photo-picker">
+                      <input ref={photoInput} type="file" accept="image/jpeg,image/png,image/webp" aria-labelledby="photo-label" aria-describedby={photoError ? 'photo-hint photo-error' : 'photo-hint'} disabled={status === 'sending'} onChange={choosePhoto} />
+                      {photoPreview && photo ? <img src={photoPreview} alt="" className="photo-preview" /> : <span className="photo-picker-icon"><ImagePlus size={20} /></span>}
+                      <span className="photo-picker-copy"><strong>{photo ? 'Changer la photo' : 'Ajouter une photo'}</strong><small>{photo ? photo.name : 'Depuis votre appareil'}</small></span>
+                      <ArrowUpRight className="photo-picker-arrow" size={16} />
+                    </label>
+                    {photoError && <p className="photo-error" id="photo-error" role="alert">{photoError}</p>}
+                    {(photo || photoError) && <button type="button" className="photo-remove" onClick={removePhoto} disabled={status === 'sending'}><Trash2 size={13} /> {photo ? 'Retirer la photo' : 'Continuer sans photo'}</button>}
+                  </div>
                   <fieldset className="color-fieldset"><legend>Choisissez votre couleur <b>*</b></legend><div className="color-options">{COLORS.map((color) => <label className={`color-option ${selectedColor === color.name ? 'is-selected' : ''}`} key={color.name}><input type="radio" name="color" value={color.name} checked={selectedColor === color.name} onChange={() => setSelectedColor(color.name)} /><span className="color-dot" style={{ backgroundColor: color.value }}>{selectedColor === color.name && <Check size={14} strokeWidth={2.8} />}</span><span>{color.name}</span></label>)}</div></fieldset>
                   <label className="field quantity-field"><span>Quantité souhaitée <b>*</b></span><input type="number" min={1} max={1000} required value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></label>
                   <label className="honeypot" aria-hidden="true">Site web<input name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} /></label>
                   {status === 'error' && <p className="form-error" role="alert">{message}</p>}
                   <button className="button button-primary form-submit" type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Envoi en cours…' : 'Envoyer ma demande'} <ArrowUpRight size={18} /></button>
-                  <p className="form-privacy">En envoyant votre demande, vous acceptez que vos informations soient utilisées pour vous répondre. Votre adresse IP peut être conservée pour protéger le site.</p>
+                  <p className="form-privacy">En envoyant votre demande, vous acceptez que vos informations et votre éventuelle photo soient utilisées pour vous répondre. La photo reste privée ; votre adresse IP peut être conservée pour protéger le site.</p>
                 </form>
               </>
             )}
