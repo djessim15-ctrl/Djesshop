@@ -4,6 +4,7 @@ import { NextRequest } from 'next/server';
 import { COLORS } from '../lib/colors';
 import { normalizeIp, getClientIp } from '../lib/client-ip';
 import { validateRequest } from '../lib/validation';
+import { isSameOrigin } from '../lib/admin';
 import { POST as submitRequest } from '../app/api/requests/route';
 import { proxy } from '../proxy';
 
@@ -44,6 +45,17 @@ test('seuls les en-têtes d’un proxy explicitement fiable sont utilisés', () 
   process.env.VERCEL = '1';
   assert.equal(getClientIp(headers), '2001:db8::1');
   assert.equal(getClientIp(new Headers({ 'x-forwarded-for': '192.0.2.10' })), null);
+});
+
+test('la protection CSRF compare le vrai hôte demandé, même derrière un proxy', () => {
+  reset();
+  (process.env as Record<string, string | undefined>).NODE_ENV = 'development';
+  const make = (origin: string, host = 'localhost:3001', protocol = 'http') => new Request('http://0.0.0.0:3001/api/admin/session', { headers: { origin, host, 'x-forwarded-proto': protocol } });
+  assert.equal(isSameOrigin(make('http://localhost:3001')), true);
+  assert.equal(isSameOrigin(make('http://attacker.example')), false);
+  assert.equal(isSameOrigin(make('https://localhost:3001')), false);
+  assert.equal(isSameOrigin(make('http://localhost:3001', 'localhost:3001,attacker.example')), false);
+  assert.equal(isSameOrigin(new Request('http://0.0.0.0:3001/api/admin/session', { headers: { host: 'localhost:3001' } })), false);
 });
 
 test('aucune demande réelle ne réussit sans Supabase, le mode aperçu est explicite', async () => {
